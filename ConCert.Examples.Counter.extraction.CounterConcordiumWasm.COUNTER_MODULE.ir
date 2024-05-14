@@ -1,0 +1,563 @@
+
+letrec [
+  fun y_wrapper_101<3>(env_126,init_value_127) := 
+    let ctx_proj_128 := proj_0 388 env_126 in 
+    let y_130 := app f_case_known_104<38>(ctx_proj_128) in 
+    let y_131 := build_state(init_value_127,y_130) in 
+    let y_132 := Ok(y_131) in 
+    halt y_132
+  fun y_wrapper_102<3>(env_133,ctx_134) := 
+    let BaseTypes_proj_135 := proj_1 390 env_133 in 
+    let chain_proj_136 := proj_0 390 env_133 in 
+    let env_137 := con_388(ctx_134,chain_proj_136,BaseTypes_proj_135) in 
+    let y_wrapper_clo_138 := con_15(y_wrapper_101,env_137) in 
+    halt y_wrapper_clo_138
+  fun y_wrapper_103<3>(env_139,chain_140) := 
+    let BaseTypes_proj_141 := proj_0 392 env_139 in 
+    let env_142 := con_390(chain_140,BaseTypes_proj_141) in 
+    let y_wrapper_clo_143 := con_15(y_wrapper_102,env_142) in 
+    halt y_wrapper_clo_143
+  fun f_case_known_104<38>(s_145) := 
+    case s_145 of {
+    | build_ctx => 
+      let ctx_from_146 := proj_1 108 s_145 in 
+      halt ctx_from_146
+    }
+  fun ConCert.Examples.Counter.Counter.counter_init_wrapper_105<3>(env_147,BaseTypes_148) := 
+    let env_149 := con_392(BaseTypes_148) in 
+    let y_wrapper_clo_150 := con_15(y_wrapper_103,env_149) in 
+    halt y_wrapper_clo_150
+  fun compare_cont_uncurried_uncurried_known_106<31>(y_152,x_153,r_154) := 
+    case x_153 of {
+    | xI => 
+      let p_155 := proj_0 117 x_153 in 
+      case y_152 of {
+      | xI => 
+        let q_156 := proj_0 117 y_152 in 
+        compare_cont_uncurried_uncurried_known_106<31>(q_156,p_155,r_154)
+      | xO => 
+        let q_157 := proj_0 118 y_152 in 
+        let y_158 := Gt() in 
+        compare_cont_uncurried_uncurried_known_106<31>(q_157,p_155,y_158)
+      | xH => 
+        let y_159 := Gt() in 
+        halt y_159
+      }
+    | xO => 
+      let p_160 := proj_0 118 x_153 in 
+      case y_152 of {
+      | xI => 
+        let q_161 := proj_0 117 y_152 in 
+        let y_162 := Lt() in 
+        compare_cont_uncurried_uncurried_known_106<31>(q_161,p_160,y_162)
+      | xO => 
+        let q_163 := proj_0 118 y_152 in 
+        compare_cont_uncurried_uncurried_known_106<31>(q_163,p_160,r_154)
+      | xH => 
+        let y_164 := Gt() in 
+        halt y_164
+      }
+    | xH => 
+      case y_152 of {
+      | xI => 
+        let y_165 := Lt() in 
+        halt y_165
+      | xO => 
+        let y_166 := Lt() in 
+        halt y_166
+      | xH => 
+        halt r_154
+      }
+    }
+  fun Coq.ZArith.BinIntDef.Z.ltb_uncurried_known_107<31>(y_168,x_169,y_170) := 
+    let y_172 := app f_case_known_108<31>(x_169,y_170,y_168) in 
+    case y_172 of {
+    | Eq => 
+      let y_173 := false() in 
+      halt y_173
+    | Lt => 
+      let y_174 := true() in 
+      halt y_174
+    | Gt => 
+      let y_175 := false() in 
+      halt y_175
+    }
+  fun f_case_known_108<31>(s_177,y_178,y_179) := 
+    case s_177 of {
+    | Z0 => 
+      case y_179 of {
+      | Z0 => 
+        let y_180 := Eq() in 
+        halt y_180
+      | Zpos => 
+        let y_181 := Lt() in 
+        halt y_181
+      | Zneg => 
+        let y_182 := Gt() in 
+        halt y_182
+      }
+    | Zpos => 
+      let x'_183 := proj_0 113 s_177 in 
+      case y_179 of {
+      | Z0 => 
+        let y_184 := Gt() in 
+        halt y_184
+      | Zpos => 
+        let y'_185 := proj_0 113 y_179 in 
+        compare_cont_uncurried_uncurried_known_106<31>(y'_185,x'_183,y_178)
+      | Zneg => 
+        let y_187 := Gt() in 
+        halt y_187
+      }
+    | Zneg => 
+      let x'_188 := proj_0 114 s_177 in 
+      case y_179 of {
+      | Z0 => 
+        let y_189 := Lt() in 
+        halt y_189
+      | Zpos => 
+        let y_190 := Lt() in 
+        halt y_190
+      | Zneg => 
+        let y'_191 := proj_0 114 y_179 in 
+        let y_193 := app compare_cont_uncurried_uncurried_known_106<31>(y'_191,x'_188,y_178) in 
+        case y_193 of {
+        | Eq => 
+          let y_194 := Eq() in 
+          halt y_194
+        | Lt => 
+          let y_195 := Gt() in 
+          halt y_195
+        | Gt => 
+          let y_196 := Lt() in 
+          halt y_196
+        }
+      }
+    }
+  fun succ_known_109<39>(x_198) := 
+    case x_198 of {
+    | xI => 
+      let p_199 := proj_0 117 x_198 in 
+      let y_200 := app succ_known_109<39>(p_199) in 
+      let y_201 := xO(y_200) in 
+      halt y_201
+    | xO => 
+      let p_202 := proj_0 118 x_198 in 
+      let y_203 := xI(p_202) in 
+      halt y_203
+    | xH => 
+      let y_204 := xH() in 
+      let y_205 := xO(y_204) in 
+      halt y_205
+    }
+  fun add_uncurried_known_110<3>(y_207,x_208) := 
+    case x_208 of {
+    | xI => 
+      let p_209 := proj_0 117 x_208 in 
+      case y_207 of {
+      | xI => 
+        let q_210 := proj_0 117 y_207 in 
+        let y_211 := app add_carry_uncurried_known_111<3>(q_210,p_209) in 
+        let y_212 := xO(y_211) in 
+        halt y_212
+      | xO => 
+        let q_213 := proj_0 118 y_207 in 
+        let y_214 := app add_uncurried_known_110<3>(q_213,p_209) in 
+        let y_215 := xI(y_214) in 
+        halt y_215
+      | xH => 
+        let y_217 := app succ_known_109<39>(p_209) in 
+        let y_218 := xO(y_217) in 
+        halt y_218
+      }
+    | xO => 
+      let p_219 := proj_0 118 x_208 in 
+      case y_207 of {
+      | xI => 
+        let q_220 := proj_0 117 y_207 in 
+        let y_221 := app add_uncurried_known_110<3>(q_220,p_219) in 
+        let y_222 := xI(y_221) in 
+        halt y_222
+      | xO => 
+        let q_223 := proj_0 118 y_207 in 
+        let y_224 := app add_uncurried_known_110<3>(q_223,p_219) in 
+        let y_225 := xO(y_224) in 
+        halt y_225
+      | xH => 
+        let y_226 := xI(p_219) in 
+        halt y_226
+      }
+    | xH => 
+      case y_207 of {
+      | xI => 
+        let q_227 := proj_0 117 y_207 in 
+        let y_229 := app succ_known_109<39>(q_227) in 
+        let y_230 := xO(y_229) in 
+        halt y_230
+      | xO => 
+        let q_231 := proj_0 118 y_207 in 
+        let y_232 := xI(q_231) in 
+        halt y_232
+      | xH => 
+        let y_233 := xH() in 
+        let y_234 := xO(y_233) in 
+        halt y_234
+      }
+    }
+  fun add_carry_uncurried_known_111<3>(y_236,x_237) := 
+    case x_237 of {
+    | xI => 
+      let p_238 := proj_0 117 x_237 in 
+      case y_236 of {
+      | xI => 
+        let q_239 := proj_0 117 y_236 in 
+        let y_240 := app add_carry_uncurried_known_111<3>(q_239,p_238) in 
+        let y_241 := xI(y_240) in 
+        halt y_241
+      | xO => 
+        let q_242 := proj_0 118 y_236 in 
+        let y_243 := app add_carry_uncurried_known_111<3>(q_242,p_238) in 
+        let y_244 := xO(y_243) in 
+        halt y_244
+      | xH => 
+        let y_246 := app succ_known_109<39>(p_238) in 
+        let y_247 := xI(y_246) in 
+        halt y_247
+      }
+    | xO => 
+      let p_248 := proj_0 118 x_237 in 
+      case y_236 of {
+      | xI => 
+        let q_249 := proj_0 117 y_236 in 
+        let y_250 := app add_carry_uncurried_known_111<3>(q_249,p_248) in 
+        let y_251 := xO(y_250) in 
+        halt y_251
+      | xO => 
+        let q_252 := proj_0 118 y_236 in 
+        let y_253 := app add_uncurried_known_110<3>(q_252,p_248) in 
+        let y_254 := xI(y_253) in 
+        halt y_254
+      | xH => 
+        let y_256 := app succ_known_109<39>(p_248) in 
+        let y_257 := xO(y_256) in 
+        halt y_257
+      }
+    | xH => 
+      case y_236 of {
+      | xI => 
+        let q_258 := proj_0 117 y_236 in 
+        let y_260 := app succ_known_109<39>(q_258) in 
+        let y_261 := xI(y_260) in 
+        halt y_261
+      | xO => 
+        let q_262 := proj_0 118 y_236 in 
+        let y_264 := app succ_known_109<39>(q_262) in 
+        let y_265 := xO(y_264) in 
+        halt y_265
+      | xH => 
+        let y_266 := xH() in 
+        let y_267 := xI(y_266) in 
+        halt y_267
+      }
+    }
+  fun Coq.ZArith.BinIntDef.Z.double_known_112<40>(x_269) := 
+    case x_269 of {
+    | Z0 => 
+      let y_270 := Z0() in 
+      halt y_270
+    | Zpos => 
+      let p_271 := proj_0 113 x_269 in 
+      let y_272 := xO(p_271) in 
+      let y_273 := Zpos(y_272) in 
+      halt y_273
+    | Zneg => 
+      let p_274 := proj_0 114 x_269 in 
+      let y_275 := xO(p_274) in 
+      let y_276 := Zneg(y_275) in 
+      halt y_276
+    }
+  fun pred_double_known_113<41>(x_278) := 
+    case x_278 of {
+    | xI => 
+      let p_279 := proj_0 117 x_278 in 
+      let y_280 := xO(p_279) in 
+      let y_281 := xI(y_280) in 
+      halt y_281
+    | xO => 
+      let p_282 := proj_0 118 x_278 in 
+      let y_283 := app pred_double_known_113<41>(p_282) in 
+      let y_284 := xI(y_283) in 
+      halt y_284
+    | xH => 
+      let y_285 := xH() in 
+      halt y_285
+    }
+  fun pos_sub_uncurried_known_114<3>(y_287,x_288) := 
+    case x_288 of {
+    | xI => 
+      let p_289 := proj_0 117 x_288 in 
+      case y_287 of {
+      | xI => 
+        let q_290 := proj_0 117 y_287 in 
+        let y_291 := app pos_sub_uncurried_known_114<3>(q_290,p_289) in 
+        Coq.ZArith.BinIntDef.Z.double_known_112<40>(y_291)
+      | xO => 
+        let q_293 := proj_0 118 y_287 in 
+        let y_294 := app pos_sub_uncurried_known_114<3>(q_293,p_289) in 
+        case y_294 of {
+        | Z0 => 
+          let y_295 := xH() in 
+          let y_296 := Zpos(y_295) in 
+          halt y_296
+        | Zpos => 
+          let p_297 := proj_0 113 y_294 in 
+          let y_298 := xI(p_297) in 
+          let y_299 := Zpos(y_298) in 
+          halt y_299
+        | Zneg => 
+          let p_300 := proj_0 114 y_294 in 
+          let y_302 := app pred_double_known_113<41>(p_300) in 
+          let y_303 := Zneg(y_302) in 
+          halt y_303
+        }
+      | xH => 
+        let y_304 := xO(p_289) in 
+        let y_305 := Zpos(y_304) in 
+        halt y_305
+      }
+    | xO => 
+      let p_306 := proj_0 118 x_288 in 
+      case y_287 of {
+      | xI => 
+        let q_307 := proj_0 117 y_287 in 
+        let y_308 := app pos_sub_uncurried_known_114<3>(q_307,p_306) in 
+        case y_308 of {
+        | Z0 => 
+          let y_309 := xH() in 
+          let y_310 := Zneg(y_309) in 
+          halt y_310
+        | Zpos => 
+          let p_311 := proj_0 113 y_308 in 
+          let y_313 := app pred_double_known_113<41>(p_311) in 
+          let y_314 := Zpos(y_313) in 
+          halt y_314
+        | Zneg => 
+          let p_315 := proj_0 114 y_308 in 
+          let y_316 := xI(p_315) in 
+          let y_317 := Zneg(y_316) in 
+          halt y_317
+        }
+      | xO => 
+        let q_318 := proj_0 118 y_287 in 
+        let y_319 := app pos_sub_uncurried_known_114<3>(q_318,p_306) in 
+        Coq.ZArith.BinIntDef.Z.double_known_112<40>(y_319)
+      | xH => 
+        let y_322 := app pred_double_known_113<41>(p_306) in 
+        let y_323 := Zpos(y_322) in 
+        halt y_323
+      }
+    | xH => 
+      case y_287 of {
+      | xI => 
+        let q_324 := proj_0 117 y_287 in 
+        let y_325 := xO(q_324) in 
+        let y_326 := Zneg(y_325) in 
+        halt y_326
+      | xO => 
+        let q_327 := proj_0 118 y_287 in 
+        let y_329 := app pred_double_known_113<41>(q_327) in 
+        let y_330 := Zneg(y_329) in 
+        halt y_330
+      | xH => 
+        let y_331 := Z0() in 
+        halt y_331
+      }
+    }
+  fun Coq.ZArith.BinIntDef.Z.add_uncurried_known_115<3>(y_333,x_334) := 
+    case x_334 of {
+    | Z0 => 
+      halt y_333
+    | Zpos => 
+      let x'_335 := proj_0 113 x_334 in 
+      case y_333 of {
+      | Z0 => 
+        halt x_334
+      | Zpos => 
+        let y'_336 := proj_0 113 y_333 in 
+        let y_338 := app add_uncurried_known_110<3>(y'_336,x'_335) in 
+        let y_339 := Zpos(y_338) in 
+        halt y_339
+      | Zneg => 
+        let y'_340 := proj_0 114 y_333 in 
+        pos_sub_uncurried_known_114<3>(y'_340,x'_335)
+      }
+    | Zneg => 
+      let x'_342 := proj_0 114 x_334 in 
+      case y_333 of {
+      | Z0 => 
+        halt x_334
+      | Zpos => 
+        let y'_343 := proj_0 113 y_333 in 
+        pos_sub_uncurried_known_114<3>(x'_342,y'_343)
+      | Zneg => 
+        let y'_345 := proj_0 114 y_333 in 
+        let y_347 := app add_uncurried_known_110<3>(y'_345,x'_342) in 
+        let y_348 := Zneg(y_347) in 
+        halt y_348
+      }
+    }
+  fun ConCert.Examples.Counter.Counter.count_uncurried_known_116<42>(s_350) := 
+    case s_350 of {
+    | build_state => 
+      let count_352 := proj_0 105 s_350 in 
+      halt count_352
+    }
+  fun ConCert.Examples.Counter.Counter.owner_uncurried_known_117<43>(s_354) := 
+    case s_354 of {
+    | build_state => 
+      let owner_356 := proj_1 105 s_354 in 
+      halt owner_356
+    }
+  fun y_118<3>(env_357,msg_358) := 
+    let state_proj_360 := proj_0 439 env_357 in 
+    let BaseTypes_proj_363 := proj_3 439 env_357 in 
+    let y_proj_364 := proj_5 439 env_357 in 
+    let ConCert.Examples.Counter.Counter.default_error_proj_365 := proj_4 439 env_357 in 
+    ConCert.Examples.Counter.Counter.counter_receive_uncurried_uncurried_uncurried_uncurried_known_122<44>(msg_358,state_proj_360,BaseTypes_proj_363,y_proj_364,ConCert.Examples.Counter.Counter.default_error_proj_365)
+  fun y_wrapper_119<3>(env_366,state_367) := 
+    let y_proj_368 := proj_4 441 env_366 in 
+    let ConCert.Examples.Counter.Counter.default_error_proj_369 := proj_3 441 env_366 in 
+    let BaseTypes_proj_370 := proj_2 441 env_366 in 
+    let chain_proj_371 := proj_1 441 env_366 in 
+    let ctx_proj_372 := proj_0 441 env_366 in 
+    let env_373 := con_439(state_367,ctx_proj_372,chain_proj_371,BaseTypes_proj_370,ConCert.Examples.Counter.Counter.default_error_proj_369,y_proj_368) in 
+    let y_clo_374 := con_15(y_118,env_373) in 
+    halt y_clo_374
+  fun y_wrapper_120<3>(env_375,ctx_376) := 
+    let y_proj_377 := proj_3 443 env_375 in 
+    let ConCert.Examples.Counter.Counter.default_error_proj_378 := proj_2 443 env_375 in 
+    let BaseTypes_proj_379 := proj_1 443 env_375 in 
+    let chain_proj_380 := proj_0 443 env_375 in 
+    let env_381 := con_441(ctx_376,chain_proj_380,BaseTypes_proj_379,ConCert.Examples.Counter.Counter.default_error_proj_378,y_proj_377) in 
+    let y_wrapper_clo_382 := con_15(y_wrapper_119,env_381) in 
+    halt y_wrapper_clo_382
+  fun y_wrapper_121<3>(env_383,chain_384) := 
+    let y_proj_385 := proj_2 445 env_383 in 
+    let ConCert.Examples.Counter.Counter.default_error_proj_386 := proj_1 445 env_383 in 
+    let BaseTypes_proj_387 := proj_0 445 env_383 in 
+    let env_388 := con_443(chain_384,BaseTypes_proj_387,ConCert.Examples.Counter.Counter.default_error_proj_386,y_proj_385) in 
+    let y_wrapper_clo_389 := con_15(y_wrapper_120,env_388) in 
+    halt y_wrapper_clo_389
+  fun ConCert.Examples.Counter.Counter.counter_receive_uncurried_uncurried_uncurried_uncurried_known_122<44>(msg_391,state_392,BaseTypes_395,y_396,ConCert.Examples.Counter.Counter.default_error_397) := 
+    case msg_391 of {
+    | Some => 
+      let m_398 := proj_0 115 msg_391 in 
+      let env_399 := con_447(state_392,BaseTypes_395,ConCert.Examples.Counter.Counter.default_error_397,y_396) in 
+      let y_400 := app f_case_123<3>(env_399,m_398) in 
+      case y_400 of {
+      | Ok => 
+        let res_401 := proj_0 106 y_400 in 
+        let y_402 := nil() in 
+        let y_403 := pair(res_401,y_402) in 
+        let y_404 := Ok(y_403) in 
+        halt y_404
+      | Err => 
+        let e_405 := proj_0 107 y_400 in 
+        let y_406 := Err(e_405) in 
+        halt y_406
+      }
+    | None => 
+      let y_407 := Err(ConCert.Examples.Counter.Counter.default_error_397) in 
+      halt y_407
+    }
+  fun f_case_123<3>(env_408,s_409) := 
+    case s_409 of {
+    | Inc => 
+      let i_410 := proj_0 103 s_409 in 
+      let y_411 := Z0() in 
+      let y_proj_413 := proj_3 447 env_408 in 
+      let y_414 := app Coq.ZArith.BinIntDef.Z.ltb_uncurried_known_107<31>(i_410,y_411,y_proj_413) in 
+      case y_414 of {
+      | true => 
+        let state_proj_416 := proj_0 447 env_408 in 
+        let y_418 := app ConCert.Examples.Counter.Counter.count_uncurried_known_116<42>(state_proj_416) in 
+        let y_420 := app Coq.ZArith.BinIntDef.Z.add_uncurried_known_115<3>(i_410,y_418) in 
+        let state_proj_422 := proj_0 447 env_408 in 
+        let y_424 := app ConCert.Examples.Counter.Counter.owner_uncurried_known_117<43>(state_proj_422) in 
+        let y_425 := build_state(y_420,y_424) in 
+        let y_426 := Ok(y_425) in 
+        halt y_426
+      | false => 
+        let ConCert.Examples.Counter.Counter.default_error_proj_427 := proj_2 447 env_408 in 
+        let y_428 := Err(ConCert.Examples.Counter.Counter.default_error_proj_427) in 
+        halt y_428
+      }
+    | Dec => 
+      let i_429 := proj_0 104 s_409 in 
+      let y_430 := Z0() in 
+      let y_proj_432 := proj_3 447 env_408 in 
+      let y_433 := app Coq.ZArith.BinIntDef.Z.ltb_uncurried_known_107<31>(i_429,y_430,y_proj_432) in 
+      case y_433 of {
+      | true => 
+        let state_proj_435 := proj_0 447 env_408 in 
+        let y_437 := app ConCert.Examples.Counter.Counter.count_uncurried_known_116<42>(state_proj_435) in 
+        let y_439 := app f_case_known_124<45>(i_429) in 
+        let y_441 := app Coq.ZArith.BinIntDef.Z.add_uncurried_known_115<3>(y_439,y_437) in 
+        let state_proj_443 := proj_0 447 env_408 in 
+        let y_445 := app ConCert.Examples.Counter.Counter.owner_uncurried_known_117<43>(state_proj_443) in 
+        let y_446 := build_state(y_441,y_445) in 
+        let y_447 := Ok(y_446) in 
+        halt y_447
+      | false => 
+        let ConCert.Examples.Counter.Counter.default_error_proj_448 := proj_2 447 env_408 in 
+        let y_449 := Err(ConCert.Examples.Counter.Counter.default_error_proj_448) in 
+        halt y_449
+      }
+    }
+  fun f_case_known_124<45>(s_451) := 
+    case s_451 of {
+    | Z0 => 
+      let y_452 := Z0() in 
+      halt y_452
+    | Zpos => 
+      let x_453 := proj_0 113 s_451 in 
+      let y_454 := Zneg(x_453) in 
+      halt y_454
+    | Zneg => 
+      let x_455 := proj_0 114 s_451 in 
+      let y_456 := Zpos(x_455) in 
+      halt y_456
+    }
+  fun ConCert.Examples.Counter.Counter.counter_receive_wrapper_125<3>(env_457,BaseTypes_458) := 
+    let y_proj_459 := proj_0 457 env_457 in 
+    let ConCert.Examples.Counter.Counter.default_error_proj_460 := proj_1 457 env_457 in 
+    let env_461 := con_445(BaseTypes_458,ConCert.Examples.Counter.Counter.default_error_proj_460,y_proj_459) in 
+    let y_wrapper_clo_462 := con_15(y_wrapper_121,env_461) in 
+    halt y_wrapper_clo_462
+] in
+let env_463 := con_395() in 
+let y_464 := Eq() in 
+let y_465 := O() in 
+let ConCert.Examples.Counter.Counter.default_error_466 := S(y_465) in 
+let env_467 := con_457(y_464,ConCert.Examples.Counter.Counter.default_error_466) in 
+let y_468 := x63() in 
+let y_469 := x6f() in 
+let y_470 := x75() in 
+let y_471 := x6e() in 
+let y_472 := x74() in 
+let y_473 := x65() in 
+let y_474 := x72() in 
+let y_475 := EmptyString() in 
+let y_476 := String(y_474,y_475) in 
+let y_477 := String(y_473,y_476) in 
+let y_478 := String(y_472,y_477) in 
+let y_479 := String(y_471,y_478) in 
+let y_480 := String(y_470,y_479) in 
+let y_481 := String(y_469,y_480) in 
+let y_482 := String(y_468,y_481) in 
+let y_483 := nil() in 
+let ConCert.Examples.Counter.Counter.counter_init_wrapper_clo_484 := con_15(ConCert.Examples.Counter.Counter.counter_init_wrapper_105,env_463) in 
+let ConCert.Examples.Counter.Counter.counter_receive_wrapper_clo_485 := con_15(ConCert.Examples.Counter.Counter.counter_receive_wrapper_125,env_467) in 
+let ConCert.Examples.Counter.extraction.CounterConcordiumWasm.COUNTER_MODULE_486 := Build_ConcordiumMod(y_482,ConCert.Examples.Counter.Counter.counter_init_wrapper_clo_484,ConCert.Examples.Counter.Counter.counter_receive_wrapper_clo_485,y_483) in 
+halt ConCert.Examples.Counter.extraction.CounterConcordiumWasm.COUNTER_MODULE_486
+
