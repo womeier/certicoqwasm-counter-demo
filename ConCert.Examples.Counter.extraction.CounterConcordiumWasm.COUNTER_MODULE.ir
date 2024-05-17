@@ -6,27 +6,32 @@ letrec [
     let y_131 := build_state(init_value_127,y_130) in 
     let y_132 := Ok(y_131) in 
     halt y_132
+
   fun y_wrapper_102<3>(env_133,ctx_134) := 
     let BaseTypes_proj_135 := proj_1 390 env_133 in 
     let chain_proj_136 := proj_0 390 env_133 in 
     let env_137 := con_388(ctx_134,chain_proj_136,BaseTypes_proj_135) in 
     let y_wrapper_clo_138 := con_15(y_wrapper_101,env_137) in 
     halt y_wrapper_clo_138
+
   fun y_wrapper_103<3>(env_139,chain_140) := 
     let BaseTypes_proj_141 := proj_0 392 env_139 in 
     let env_142 := con_390(chain_140,BaseTypes_proj_141) in 
     let y_wrapper_clo_143 := con_15(y_wrapper_102,env_142) in 
     halt y_wrapper_clo_143
+
   fun f_case_known_104<38>(s_145) := 
     case s_145 of {
     | build_ctx => 
       let ctx_from_146 := proj_1 108 s_145 in 
       halt ctx_from_146
     }
+
   fun ConCert.Examples.Counter.Counter.counter_init_wrapper_105<3>(env_147,BaseTypes_148) := 
     let env_149 := con_392(BaseTypes_148) in 
     let y_wrapper_clo_150 := con_15(y_wrapper_103,env_149) in 
     halt y_wrapper_clo_150
+
   fun compare_cont_uncurried_uncurried_known_106<31>(y_152,x_153,r_154) := 
     case x_153 of {
     | xI => 
