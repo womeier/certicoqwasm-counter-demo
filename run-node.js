@@ -1,4 +1,5 @@
-import { print_i63, print_compare, print_bool, print_nat_sexp, print_nat_notation, print_list_sexp, print_list_notation, print_option, print_prod, print_positive_sexp, print_N_sexp, print_Z_sexp, print_compcert_byte_sexp } from './pp.js';
+import { print_i63, print_compare, print_bool, print_nat_sexp, print_nat_notation, print_list_sexp, print_list_notation, print_option, print_result,
+         print_prod, print_positive_sexp, print_N_sexp, print_Z_sexp, print_compcert_byte_sexp, print_state } from './pp.js';
 
 import * as fs from 'fs';
 
@@ -79,7 +80,8 @@ let importObject = {
         obj.instance.exports._0__y_wrapper_101(y_wrapper_101_funenv, initValue);
 
         const initResult /* : result State Error */ = obj.instance.exports.result.value;
-        console.log(initResult);
+        print_result(initResult, dataView, print_state, print_nat_notation);
+        console.log();
 
         // const receive_wrapper_funenv = dataView.getInt32(receive_wrapper_clos + 8, true);
         // console.log(init_wrapper_funidx, receive_wrapper_funidx);

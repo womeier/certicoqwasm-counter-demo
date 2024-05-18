@@ -145,6 +145,24 @@ export const print_option = (val, dataView, print_elem) => {
     }
 }
 
+export const print_result = (val, dataView, print_elem_ok, print_elem_err) => {
+    const tag = dataView.getInt32(val, true);
+    const arg = dataView.getInt32(val + 4, true);
+
+    switch (tag) {
+    case 0:
+	process.stdout.write("(Ok ");
+	print_elem_ok(arg, dataView);
+	break;
+    case 1:
+	process.stdout.write("(Err ")
+	print_elem_err(arg, dataView);
+	break;
+    }
+    
+    process.stdout.write(")");
+}
+
 export const print_prod = (val, dataView, print_elem1, print_elem2) => {
     process.stdout.write("(");
     const arg1 = dataView.getInt32(val + 4, true);
@@ -212,5 +230,16 @@ export const print_compcert_byte_sexp = (val, dataView) => {
     process.stdout.write("(mkint ");
     const arg = dataView.getInt32(val + 4, true);
     print_Z_sexp(arg, dataView);
+    process.stdout.write(")");
+}
+
+export const print_state = (val, dataView) => {
+    process.stdout.write("(build_state ");
+    const arg1 = dataView.getInt32(val + 4, true);
+    print_Z_sexp(arg1, dataView);
+
+    const arg2 = dataView.getInt32(val + 8, true);
+    process.stdout.write(" (TODO print owner : Address)");
+
     process.stdout.write(")");
 }
