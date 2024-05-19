@@ -243,3 +243,5 @@ export const print_state = (val, dataView) => {
 
     process.stdout.write(")");
 }
+
+export const print_Error = print_nat_notation;
