@@ -239,7 +239,7 @@ export const print_state = (val, dataView) => {
     print_Z_sexp(arg1, dataView);
 
     const arg2 = dataView.getInt32(val + 8, true);
-    process.stdout.write(" (TODO print owner : Address)");
+    process.stdout.write(" <address>");
 
     process.stdout.write(")");
 }

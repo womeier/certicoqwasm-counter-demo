@@ -53,7 +53,15 @@ function print_Msg(val, dataView) {
     process.stdout.write(")")
 }
 
-function alloc_positive(module, dataView, n) {
+
+function get_dataView(module) {
+    const memory = module.instance.exports.memory;
+    return new DataView(memory.buffer);
+}
+
+function alloc_positive(module, n) {
+    const dataView = get_dataView(module);
+
     if (n <= 0) {
         console.log();
         console.log(`Expected positive n, got ${n}`);
@@ -77,27 +85,31 @@ function alloc_positive(module, dataView, n) {
     return result;
 }
 
-function alloc_Z(module, dataView, n) {
+function alloc_Z(module, n) {
+    const dataView = get_dataView(module);
+
     if (n == 0) {
         return 1; // Z0
     } else {
         const is_positive = n > 0;
         if (!is_positive) { n = -n; }
 
-        const p = alloc_positive(module, dataView, n);
+        const p = alloc_positive(module, n);
         const gmp = module.instance.exports.bytes_used.value;        
 
         const tag = is_positive ? 0 /* Zpos */ : 1 /* Zneg */;
-        dataView.setInt32(gmp, tag, true); // Zpos
+        dataView.setInt32(gmp, tag, true);
         dataView.setInt32(gmp + 4, p, true);
         module.instance.exports.bytes_used.value = gmp + 8;
         return gmp;
     }
 }
 
-function alloc_Msg_Inc(module, dataView, n) {
+function alloc_Msg_Inc(module, n) {
+    const dataView = get_dataView(module);
+
     const tag = 0; // Inc
-    const z = alloc_Z(module, dataView, n);
+    const z = alloc_Z(module, n);
 
     const gmp = module.instance.exports.bytes_used.value;        
     dataView.setInt32(gmp, tag, true);
@@ -106,9 +118,11 @@ function alloc_Msg_Inc(module, dataView, n) {
     return gmp;
 }
 
-function alloc_Msg_Dec(module, dataView, n) {
+function alloc_Msg_Dec(module, n) {
+    const dataView = get_dataView(module);
+
     const tag = 1; // Dec
-    const z = alloc_Z(module, dataView, n);
+    const z = alloc_Z(module, n);
 
     const gmp = module.instance.exports.bytes_used.value;        
     dataView.setInt32(gmp, tag, true);
@@ -117,7 +131,9 @@ function alloc_Msg_Dec(module, dataView, n) {
     return gmp;
 }
 
-function alloc_Some(module, dataView, ptr) {
+function alloc_Some(module, ptr) {
+    const dataView = get_dataView(module);
+
     const tag = 0; // Some
     const gmp = module.instance.exports.bytes_used.value;        
     dataView.setInt32(gmp, tag, true);
@@ -143,17 +159,17 @@ function assertSuccess(module) {
 (async () => {
     const bytes = fs.readFileSync("ConCert.Examples.Counter.extraction.CounterConcordiumWasm.COUNTER_MODULE.wasm");
 
-    const obj = await WebAssembly.instantiate(
+    const mod = await WebAssembly.instantiate(
         new Uint8Array (bytes), importObject
     );
     try {
-        // console.log(obj.instance.exports);
+        // console.log(mod.instance.exports);
 
         // START EXECUTION OF MAIN
-        obj.instance.exports.main_function();
-        assertSuccess(obj);
+        mod.instance.exports.main_function();
+        assertSuccess(mod);
 
-        const memory = obj.instance.exports.memory;
+        const memory = mod.instance.exports.memory;
         const dataView = new DataView(memory.buffer);
 
         // MAIN returns a pointer to:
@@ -165,15 +181,15 @@ function assertSuccess(module) {
         // y_482: "counter", we don't care
         // y_483: nil, we don't care
 
-        // const y_482 = dataView.getInt32(obj.instance.exports.result.value + 4, true);
-        // const y_483 = dataView.getInt32(obj.instance.exports.result.value + 16, true);
+        // const y_482 = dataView.getInt32(mod.instance.exports.result.value + 4, true);
+        // const y_483 = dataView.getInt32(mod.instance.exports.result.value + 16, true);
 
         // ============================================================================
         // INIT
         // ============================================================================
 
-        const init_wrapper_clos = dataView.getInt32(obj.instance.exports.result.value + 8, true);
-        const receive_wrapper_clos = dataView.getInt32(obj.instance.exports.result.value + 12, true);
+        const init_wrapper_clos = dataView.getInt32(mod.instance.exports.result.value + 8, true);
+        const receive_wrapper_clos = dataView.getInt32(mod.instance.exports.result.value + 12, true);
 
         // funidx 8, type i32 (env), i32 (BaseTypes_458) -> i32
         const init_wrapper_105_funidx = dataView.getInt32(init_wrapper_clos + 4, true);
@@ -181,39 +197,39 @@ function assertSuccess(module) {
 
         // console.log(init_wrapper_105_funidx); // 8: _4__ConCert_Examples_Counter_Counter_counter_init_wrapper_105
         const chainBase = 0; // TODO: provide
-        obj.instance.exports._4__ConCert_Examples_Counter_Counter_counter_init_wrapper_105(init_wrapper_105_funenv, chainBase);
-        assertSuccess(obj);
+        mod.instance.exports._4__ConCert_Examples_Counter_Counter_counter_init_wrapper_105(init_wrapper_105_funenv, chainBase);
+        assertSuccess(mod);
 
-        const y_wrapper_103_clos = obj.instance.exports.result.value;
+        const y_wrapper_103_clos = mod.instance.exports.result.value;
         const y_wrapper_103_funidx = dataView.getInt32(y_wrapper_103_clos + 4, true);
         const y_wrapper_103_funenv = dataView.getInt32(y_wrapper_103_clos + 8, true);
         // console.log(y_wrapper_103_funidx); // 6: _2__y_wrapper_103
 
         // NOTE: counter_init is curried, provide args one by one
         const chain = 0; // TODO: provide
-        obj.instance.exports._2__y_wrapper_103(y_wrapper_103_funenv, chain);
-        assertSuccess(obj);
+        mod.instance.exports._2__y_wrapper_103(y_wrapper_103_funenv, chain);
+        assertSuccess(mod);
 
-        const y_wrapper_102_clos = obj.instance.exports.result.value;
+        const y_wrapper_102_clos = mod.instance.exports.result.value;
         const y_wrapper_102_funidx = dataView.getInt32(y_wrapper_102_clos + 4, true);
         const y_wrapper_102_funenv = dataView.getInt32(y_wrapper_102_clos + 8, true);
         // console.log(y_wrapper_102_funidx); // 5: _1__y_wrapper_102
 
         const ctxInit = 0; // TODO: provide
-        obj.instance.exports._1__y_wrapper_102(y_wrapper_102_funenv, ctxInit);
-        assertSuccess(obj);
+        mod.instance.exports._1__y_wrapper_102(y_wrapper_102_funenv, ctxInit);
+        assertSuccess(mod);
 
-        const y_wrapper_101_clos = obj.instance.exports.result.value;
+        const y_wrapper_101_clos = mod.instance.exports.result.value;
         const y_wrapper_101_funidx = dataView.getInt32(y_wrapper_101_clos + 4, true);
         const y_wrapper_101_funenv = dataView.getInt32(y_wrapper_101_clos + 8, true);
         // console.log(y_wrapper_101_funidx); // 4: _0__y_wrapper_101
 
-        const initValue = alloc_Z(obj, dataView, INIT_VALUE); // TODO: provide actual
-        obj.instance.exports._0__y_wrapper_101(y_wrapper_101_funenv, initValue);
-        assertSuccess(obj);
+        const initValue = alloc_Z(mod, INIT_VALUE); // TODO: provide actual
+        mod.instance.exports._0__y_wrapper_101(y_wrapper_101_funenv, initValue);
+        assertSuccess(mod);
 
-        const initResult /* : result State Error */ = obj.instance.exports.result.value;
-        process.stdout.write("state after init: ");
+        const initResult /* : result State Error */ = mod.instance.exports.result.value;
+        process.stdout.write(`state after init (${INIT_VALUE}): `);
         print_result(initResult, dataView, print_state, print_Error);
         console.log();
 
@@ -226,49 +242,49 @@ function assertSuccess(module) {
         const receive_wrapper_funidx = dataView.getInt32(receive_wrapper_clos + 4, true);
         const receive_wrapper_funenv = dataView.getInt32(receive_wrapper_clos + 8, true);
         // console.log(receive_wrapper_funidx); // 28: _24__ConCert_Examples_Counter_Counter_counter_receive_wrapper_125
-        obj.instance.exports._24__ConCert_Examples_Counter_Counter_counter_receive_wrapper_125(receive_wrapper_funenv, chainBase);
-        assertSuccess(obj);
+        mod.instance.exports._24__ConCert_Examples_Counter_Counter_counter_receive_wrapper_125(receive_wrapper_funenv, chainBase);
+        assertSuccess(mod);
 
-        const y_wrapper_121_clos = obj.instance.exports.result.value;
+        const y_wrapper_121_clos = mod.instance.exports.result.value;
         const y_wrapper_121_funidx = dataView.getInt32(y_wrapper_121_clos + 4, true);
         const y_wrapper_121_funenv = dataView.getInt32(y_wrapper_121_clos + 8, true);
         // console.log(y_wrapper_121_funidx); // 24: _20__y_wrapper_121
-        obj.instance.exports._20__y_wrapper_121(y_wrapper_121_funenv, chain);
-        assertSuccess(obj);
+        mod.instance.exports._20__y_wrapper_121(y_wrapper_121_funenv, chain);
+        assertSuccess(mod);
 
-        const y_wrapper_120_clos = obj.instance.exports.result.value;
+        const y_wrapper_120_clos = mod.instance.exports.result.value;
         const y_wrapper_120_funidx = dataView.getInt32(y_wrapper_120_clos + 4, true);
         const y_wrapper_120_funenv = dataView.getInt32(y_wrapper_120_clos + 8, true);
         // console.log(y_wrapper_120_funidx); // 23: _19__y_wrapper_120
 
         const ctxReceive = 0; // TODO provide
-        obj.instance.exports._19__y_wrapper_120(y_wrapper_120_funenv, ctxReceive);
-        assertSuccess(obj);
+        mod.instance.exports._19__y_wrapper_120(y_wrapper_120_funenv, ctxReceive);
+        assertSuccess(mod);
 
-        const y_wrapper_119_clos = obj.instance.exports.result.value;
+        const y_wrapper_119_clos = mod.instance.exports.result.value;
         const y_wrapper_119_funidx = dataView.getInt32(y_wrapper_119_clos + 4, true);
         const y_wrapper_119_funenv = dataView.getInt32(y_wrapper_119_clos + 8, true);
         //console.log(y_wrapper_119_funidx); // 22: _18__y_wrapper_119
 
         // state obtained from counter_init
         const state = dataView.getInt32(initResult + 4, true);
-        obj.instance.exports._18__y_wrapper_119(y_wrapper_119_funenv, state);
-        assertSuccess(obj);
+        mod.instance.exports._18__y_wrapper_119(y_wrapper_119_funenv, state);
+        assertSuccess(mod);
 
-        const y_118_clos = obj.instance.exports.result.value;
+        const y_118_clos = mod.instance.exports.result.value;
         const y_118_funidx = dataView.getInt32(y_118_clos + 4, true);
         const y_118_funenv = dataView.getInt32(y_118_clos + 8, true);
         // console.log(y_118_funidx); // 21: _17__y_118
 
         // INCREASE COUNTER
-        const msgInc = alloc_Msg_Inc(obj, dataView, INCREASE_VALUE);
-        const msgOption = alloc_Some(obj, dataView, msgInc);
-        obj.instance.exports._17__y_118(y_118_funenv, msgOption);
-        assertSuccess(obj);
+        const msgInc = alloc_Msg_Inc(mod, INCREASE_VALUE);
+        const msgOption = alloc_Some(mod, msgInc);
+        mod.instance.exports._17__y_118(y_118_funenv, msgOption);
+        assertSuccess(mod);
 
-        const receiveResult = obj.instance.exports.result.value;
+        const receiveResult = mod.instance.exports.result.value;
 
-        process.stdout.write("state after receive: ");
+        process.stdout.write(`state, actions after receive (incr ${INCREASE_VALUE}): `);
         print_counter_receive_result(receiveResult, dataView);
         console.log();
 
