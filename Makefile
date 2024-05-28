@@ -1,4 +1,4 @@
-all: node
+all: run-node
 
 run-node:
 	node ./run-node.js
