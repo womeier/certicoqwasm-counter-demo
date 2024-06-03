@@ -50,6 +50,13 @@
   )
 
   (func $inc_counter (export "counter.inc") (param i64) (result i32)
+    (; 
+    ;; and then write the return value
+    (call $write_output (i32.const 0) (i32.const 8) (i32.const 0))
+    (drop)
+    ;; and return success
+    (i32.const 0)
+    ;)
     (local $entry i64)
     (i64.store (i32.const 0) (i64.const 0))
     ;; get the entry whose key is 8 zeroes
@@ -81,5 +88,6 @@
     ;; and return success
     (i32.const 0)
   )
+
   (memory 1)
 )
