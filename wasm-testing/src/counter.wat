@@ -50,21 +50,16 @@
   )
 
   (func $inc_counter (export "counter.inc") (param i64) (result i32)
-    (; 
-    ;; and then write the return value
-    (call $write_output (i32.const 0) (i32.const 8) (i32.const 0))
-    (drop)
-    ;; and return success
-    (i32.const 0)
-    ;)
     (local $entry i64)
+    (local $incr i64)
     (i64.store (i32.const 0) (i64.const 0))
     ;; get the entry whose key is 8 zeroes
     (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
     (call $state_entry_read (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
     (drop)
     ;; read the integer from the contract state, add 1 to it and store it
-    (i64.store (i32.const 0) (i64.add (i64.const 1) (i64.load (i32.const 0))))
+;;    (local.set $incr (i64.const 1))
+    (i64.store (i32.const 0) (i64.add (local.get $incr) (i64.load (i32.const 0))))
     ;; update the contract state
     (call $state_entry_write (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
     (drop)

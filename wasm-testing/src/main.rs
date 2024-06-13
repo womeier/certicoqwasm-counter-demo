@@ -54,7 +54,28 @@ fn main() {
         .unwrap();
 
     // Check the return value.
-    assert_eq!(update.return_value, to_bytes(&0u64));
+    assert_eq!(update.return_value, to_bytes(&1u64));
+
+
+    // Update the initialized contract.
+    let update2 = chain
+        .contract_update(
+            Signer::with_one_key(), // Used for specifying the number of signatures.
+            ACC,                    // Invoker account.
+            Address::Account(ACC),  // Sender (can also be a contract).
+            Energy::from(10000),    // Maximum energy allowed for the update.
+            UpdateContractPayload {
+                address: initialization.contract_address, // The contract to update.
+                receive_name: OwnedReceiveName::new_unchecked("counter.inc".into()), // The receive function to call.
+                message: OwnedParameter::from_serial(&4u64).unwrap(), // The parameter sent to the contract.
+                amount: Amount::from_ccd(100), // Sending the contract 100 CCD.
+            },
+        )
+        .unwrap();
+
+
+    // Check the return value.
+    assert_eq!(update2.return_value, to_bytes(&2u64));
 /*
     // Check the balances of both contracts and accounts.
     assert_eq!(
