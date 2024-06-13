@@ -5142,6 +5142,91 @@
     local.get 5
     global.set 2
     return)
+
+;; =================================================================================================================================
+;; inserted manually
+;; =================================================================================================================================
+    (func $get_parameter_size (param $index i32) (result i32)
+          (call 0 (local.get 0))
+          return)
+    (func $get_parameter_section (param $index i32) (param $write_location i32) (param $length i32) (param $offset i32) (result i32)
+          (call 1 (local.get 0) (local.get 1) (local.get 2) (local.get 3))
+          return)
+    (func $invoke (param $tag i32) (param $start i32) (param $length i32) (result i64)
+          (call 2 (local.get 0) (local.get 1) (local.get 2))
+          return)
+    (func $write_output (param $start i32) (param $length i32) (param $offset i32) (result i32)
+          (call 3 (local.get 0) (local.get 1) (local.get 2))
+          return)
+    (func $state_lookup_entry (param $key_start i32) (param $key_length i32) (result i64)
+          (call 4 (local.get 0) (local.get 1))
+          return)
+    (func $state_create_entry (param $key_start i32) (param $key_length i32) (result i64)
+          (call 5 (local.get 0) (local.get 1))
+          return)
+    (func $state_entry_read (param $entry i64) (param $write_location i32) (param $length i32) (param $offset i32) (result i32)
+          (call 6 (local.get 0) (local.get 1) (local.get 2) (local.get 3))
+          return)
+    (func $state_entry_write (param $entry i64) (param $read_location i32) (param $length i32) (param $offset i32) (result i32)
+          (call 7 (local.get 0) (local.get 1) (local.get 2) (local.get 3))
+          return)
+
+
+
+      ;; Helper Functions
+
+  (func $assert_eq (param $actual i32) (param $expected i32)
+    (if (i32.eq (local.get $actual) (local.get $expected))
+      (then nop)
+      (else unreachable)))
+
+  (func $assert_eq_64 (param $actual i64) (param $expected i64)
+    (if (i64.eq (local.get $actual) (local.get $expected))
+      (then nop)
+      (else unreachable)))
+
+  (func $assert_ne (param $actual i32) (param $expected i32)
+    (if (i32.ne (local.get $actual) (local.get $expected))
+      (then nop)
+      (else unreachable)))
+
+  ;; Gets an address from the parameters and asserts that the size is correct.
+  ;; The address is saved in memory at location 0.
+  (func $save_addr_from_param_to_mem_0
+    (call $assert_eq
+      (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 32) (i32.const 0))
+      (i32.const 32))
+  )
+
+  ;; The counter contract
+
+  (func $init_counter (export "init_counter") (param i64) (result i32)
+    (i64.store (i32.const 0) (i64.const 0))
+    ;; store the state in the entry whose key is 8 zeroes.
+    (call $state_entry_write (call $state_create_entry (i32.const 0) (i32.const 8)) (i32.const 0) (i32.const 8) (i32.const 0))
+    (return (i32.const 0)) ;; Successful init
+  )
+
+  (func $inc_counter (export "counter.inc") (param i64) (result i32)
+    (local $entry i64)
+    (i64.store (i32.const 0) (i64.const 0))
+    ;; get the entry whose key is 8 zeroes
+    (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
+    (call $state_entry_read (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
+    (drop)
+    ;; read the integer from the contract state, add 1 to it and store it
+    (i64.store (i32.const 0) (i64.add (i64.const 1) (i64.load (i32.const 0))))
+    ;; update the contract state
+    (call $state_entry_write (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
+    (drop)
+    ;; and then write the return value
+    (call $write_output (i32.const 0) (i32.const 8) (i32.const 0))
+    (drop)
+    ;; and return success
+    (i32.const 0)
+  )
+
+;; =================================================================================================================================
   (table (;0;) 29 funcref)
   (memory (;0;) 1 30000)
   (global (;0;) (mut i32) (i32.const 0))
@@ -5150,31 +5235,6 @@
   (global (;3;) (mut i32) (i32.const 0))
   (export "grow_mem_if_necessary" (func 8))
   (export "main_function" (func 9))
-  (export "_0__y_wrapper_101" (func 4))
-  (export "_1__y_wrapper_102" (func 5))
-  (export "_2__y_wrapper_103" (func 6))
-  (export "_3__f_case_known_104" (func 7))
-  (export "_4__ConCert_Examples_Counter_Counter_counter_init_wrapper_105" (func 8))
-  (export "_5__compare_cont_uncurried_uncurried_known_106" (func 9))
-  (export "_6__Coq_ZArith_BinIntDef_Z_ltb_uncurried_known_107" (func 10))
-  (export "_7__f_case_known_108" (func 11))
-  (export "_8__succ_known_109" (func 12))
-  (export "_9__add_uncurried_known_110" (func 13))
-  (export "_10__add_carry_uncurried_known_111" (func 14))
-  (export "_11__Coq_ZArith_BinIntDef_Z_double_known_112" (func 15))
-  (export "_12__pred_double_known_113" (func 16))
-  (export "_13__pos_sub_uncurried_known_114" (func 17))
-  (export "_14__Coq_ZArith_BinIntDef_Z_add_uncurried_known_115" (func 18))
-  (export "_15__ConCert_Examples_Counter_Counter_count_uncurried_known_116" (func 19))
-  (export "_16__ConCert_Examples_Counter_Counter_owner_uncurried_known_117" (func 20))
-  (export "_17__y_118" (func 21))
-  (export "_18__y_wrapper_119" (func 22))
-  (export "_19__y_wrapper_120" (func 23))
-  (export "_20__y_wrapper_121" (func 24))
-  (export "_21__ConCert_Examples_Counter_Counter_counter_receive_uncurried_uncurried_uncurried_uncurried_known_122" (func 25))
-  (export "_22__f_case_123" (func 26))
-  (export "_23__f_case_known_124" (func 27))
-  (export "_24__ConCert_Examples_Counter_Counter_counter_receive_wrapper_125" (func 28))
   (export "result_out_of_mem" (global 3))
   (export "bytes_used" (global 0))
   (export "result" (global 2))
