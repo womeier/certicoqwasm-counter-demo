@@ -5171,7 +5171,11 @@
           (call 7 (local.get 0) (local.get 1) (local.get 2) (local.get 3))
           return)
 
-
+    ;; get certicoqwasm result
+    (func $get_result (result i32)
+      (if (i32.eq (global.get 3) (i32.const 1)) (then unreachable)) ;; out_of_mem
+      (return (global.get 2)) ;; result_var
+    )
 
       ;; Helper Functions
 
@@ -5185,6 +5189,7 @@
       (then nop)
       (else unreachable)))
 
+  ;; local.get $actual, why indirection and not just $actual?
   (func $assert_ne (param $actual i32) (param $expected i32)
     (if (i32.ne (local.get $actual) (local.get $expected))
       (then nop)
@@ -5236,7 +5241,56 @@
   )
 
   (func $counter_incr_certicoqwasm (param $old_num i64) (result i64)
-     (i64.add (local.get 0) (i64.const 1))
+    (local $main_res i32)
+
+    (local $receive_clos i32)
+    (local $receive_fidx i32)
+    (local $receive_env i32)
+
+    ;; y_wrapper_121_clos
+    (local $rec_wrapper_1_clos i32)
+    (local $rec_wrapper_1_fidx i32)
+    (local $rec_wrapper_1_env i32)
+
+    ;; y_wrapper_120_clos
+    (local $rec_wrapper_2_clos i32)
+    (local $rec_wrapper_2_fidx i32)
+    (local $rec_wrapper_2_env i32)
+
+    ;; y_wrapper_119_clos
+    (local $rec_wrapper_3_clos i32)
+    (local $rec_wrapper_3_fidx i32)
+    (local $rec_wrapper_3_env i32)
+
+    ;; y_118_clos
+    (local $rec_wrapper_4_clos i32)
+    (local $rec_wrapper_4_fidx i32)
+    (local $rec_wrapper_4_env i32)
+
+    (local $res i32) ;; final result
+
+    ;; reserve the first 8 bytes in the linmem for concordium IO (for good measure, arbitrary choice)
+    (global.set 0 (i32.add (i32.const 64) (global.get 0))) ;; global_mem_ptr
+    ;; call main
+    (call 9)
+    (local.set $main_res (call $get_result))
+;;    (local.set $init_clos (i32.load (i32.add (local.get $main_res) (i32.const 4))))
+
+    (local.set $receive_clos (i32.load (i32.add (local.get $main_res) (i32.const 12))))
+    (local.set $receive_fidx (i32.load (i32.add (local.get $receive_clos) (i32.const 4))))
+    (local.set $receive_env (i32.load (i32.add (local.get $receive_clos) (i32.const 8))))
+
+    ;; 42: chainBase TODO specialize properly
+    (call_indirect (type 2) (local.get $receive_env) (i32.const -1) (local.get $receive_fidx))
+    (local.set $rec_wrapper_1_clos (call $get_result))
+    (local.set $rec_wrapper_1_fidx (i32.load (i32.add (local.get $rec_wrapper_1_clos) (i32.const 4))))
+    (local.set $rec_wrapper_1_env (i32.load (i32.add (local.get $rec_wrapper_1_clos) (i32.const 8))))
+
+    (; (local.set $res (local.get $rec_wrapper_1_fidx)) ;)
+    (local.set $res (local.get $rec_wrapper_1_fidx))
+
+    (i64.extend_i32_s (local.get $res))
+;;    (i64.add (local.get 0) (i64.const 1))
    )
 
 ;; =================================================================================================================================
