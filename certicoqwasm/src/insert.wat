@@ -98,6 +98,7 @@
   (func $counter_incr_certicoqwasm (param $old_num i64) (result i64)
     (local $main_res i32)
 
+    ;; receive_wrapper_125
     (local $receive_clos i32)
     (local $receive_fidx i32)
     (local $receive_env i32)
@@ -133,16 +134,37 @@
 
     (local.set $receive_clos (i32.load (i32.add (local.get $main_res) (i32.const 12))))
     (local.set $receive_fidx (i32.load (i32.add (local.get $receive_clos) (i32.const 4))))
-    (local.set $receive_env (i32.load (i32.add (local.get $receive_clos) (i32.const 8))))
-
-    ;; 42: chainBase TODO specialize properly
+    (local.set $receive_env  (i32.load (i32.add (local.get $receive_clos) (i32.const 8))))
+    ;; -1: chainBase TODO specialize properly
+;;    (call 28 (i32.const -1) (local.get $receive_env))
     (call_indirect (type 2) (local.get $receive_env) (i32.const -1) (local.get $receive_fidx))
     (local.set $rec_wrapper_1_clos (call $get_result))
     (local.set $rec_wrapper_1_fidx (i32.load (i32.add (local.get $rec_wrapper_1_clos) (i32.const 4))))
-    (local.set $rec_wrapper_1_env (i32.load (i32.add (local.get $rec_wrapper_1_clos) (i32.const 8))))
+    (local.set $rec_wrapper_1_env  (i32.load (i32.add (local.get $rec_wrapper_1_clos) (i32.const 8))))
+    ;; -1: chain TODO
+    (call_indirect (type 2) (local.get $rec_wrapper_1_env) (i32.const -1) (local.get $rec_wrapper_1_fidx))
+    (local.set $rec_wrapper_2_clos (call $get_result))
+    (local.set $rec_wrapper_2_fidx (i32.load (i32.add (local.get $rec_wrapper_2_clos) (i32.const 4))))
+    (local.set $rec_wrapper_2_env  (i32.load (i32.add (local.get $rec_wrapper_2_clos) (i32.const 8))))
+    ;; -1: ctx TODO
+    (call_indirect (type 2) (local.get $rec_wrapper_2_env) (i32.const -1) (local.get $rec_wrapper_2_fidx))
+    (local.set $rec_wrapper_3_clos (call $get_result))
+    (local.set $rec_wrapper_3_fidx (i32.load (i32.add (local.get $rec_wrapper_3_clos) (i32.const 4))))
+    (local.set $rec_wrapper_3_env  (i32.load (i32.add (local.get $rec_wrapper_3_clos) (i32.const 8))))
+    ;; -1: state TODO
+    (call_indirect (type 2) (local.get $rec_wrapper_3_env) (i32.const -1) (local.get $rec_wrapper_3_fidx))
+    (local.set $rec_wrapper_4_clos (call $get_result))
+    (local.set $rec_wrapper_4_fidx (i32.load (i32.add (local.get $rec_wrapper_4_clos) (i32.const 4))))
+    (local.set $rec_wrapper_4_env  (i32.load (i32.add (local.get $rec_wrapper_4_clos) (i32.const 8))))
+    ;; -1: msg TODO
+(;
+    (call_indirect (type 2) (local.get $rec_wrapper_4_env) (i32.const -1) (local.get $rec_wrapper_4_fidx))
+;)
+    (local.set $res (call $get_result))
 
-    (; (local.set $res (local.get $rec_wrapper_1_fidx)) ;)
-    (local.set $res (local.get $rec_wrapper_1_fidx))
+    ;;(call_indirect (type 2) (local.get $rec_wrapper_1_env) (i32.const -1) (local.get $rec_wrapper_1_fidx))
+;;    (local.set $res (local.get $receive_env))
+;;    (local.set $res (local.get $rec_wrapper_2_fidx))
 
     (i64.extend_i32_s (local.get $res))
 ;;    (i64.add (local.get 0) (i64.const 1))
