@@ -6,6 +6,11 @@ run-node:
 run-concordium-test:
 #	wasm-tools parse ./wasm-testing/src/counter.wat -o ./wasm-testing/src/counter.wasm
 #	wasm-tools validate ./wasm-testing/src/counter-certicoqwasm.wat
-	wat2wasm ./certicoqwasm/src/counter-certicoqwasm.wat -o /dev/null
-	wasm-tools parse ./certicoqwasm/src/counter-certicoqwasm.wat -o ./certicoqwasm/src/counter-certicoqwasm.wasm
+#	wat2wasm ./certicoqwasm/src/counter-certicoqwasm.wat -o /dev/null
+#	wasm-tools parse ./certicoqwasm/src/counter-certicoqwasm.wat -o ./certicoqwasm/src/counter-certicoqwasm.wasm
+	wasm-tools parse ./certicoqwasm/src/COUNTER_MODULE.wasm -t -o ./certicoqwasm/src/COUNTER_MODULE.wat
+	python3 ./certicoqwasm/src/combine.py --certicoq-wasm-file ./certicoqwasm/src/COUNTER_MODULE.wat \
+		--insert-file ./certicoqwasm/src/insert.wat --out-file ./certicoqwasm/src/counter_out.wat
+	wat2wasm ./certicoqwasm/src/counter_out.wat -o ./certicoqwasm/src/counter_out.wasm
+#	wasm-tools parse ./certicoqwasm/src/counter_out.wat -o ./certicoqwasm/src/counter_out.wasm
 	cd certicoqwasm && cargo run

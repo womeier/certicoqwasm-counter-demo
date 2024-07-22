@@ -18,7 +18,7 @@ fn main() {
         .module_deploy_v1(
             Signer::with_one_key(),
             ACC,
-            module_load_v1_raw("src/counter-certicoqwasm.wasm").unwrap(),
+            module_load_v1_raw("src/counter_out.wasm").unwrap(),
         )
         .unwrap();
 
