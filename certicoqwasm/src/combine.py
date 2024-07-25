@@ -10,21 +10,26 @@ import os
 def insert(certicoq_wasm_file, insert_file, out_file):
     with open(insert_file) as f_insert:
         with open(certicoq_wasm_file) as f_wasm:
-            cw = f_wasm.read().split("(table")
+            wat_certicoqwasm = f_wasm.read()
             i = f_insert.read()
 
             if os.path.exists(out_file):
                 os.remove(out_file)
-
             with open(out_file, "w") as f_out:
                 f_out.write("")
 
             with open(out_file, "a") as f_out:
-                f_out.write(cw[0])
-                f_out.write(i)
-                f_out.write("(table")
-                f_out.write(cw[1])
+                for line in wat_certicoqwasm.split("\n"):
+                    # insert custom wasm file after table
+                    if "(table" in line:
+                        f_out.write(line + "\n")
+                        f_out.write(i + "\n")
 
+                    # concordium limits the number of exported functions, comment out
+                    elif "(export \"_" in line:
+                        f_out.write(";; " + line + "\n")
+                    else:
+                        f_out.write(line + "\n")
 
 
 if __name__ == "__main__":
