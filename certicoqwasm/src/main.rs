@@ -54,7 +54,7 @@ fn main() {
         .unwrap();
 
     // Check the return value.
-    assert_eq!(update.return_value, to_bytes(&1u64));
+    assert_eq!(update.return_value, to_bytes(&42u64));
 
     // Update the initialized contract.
     let update = chain
