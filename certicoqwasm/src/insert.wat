@@ -51,10 +51,11 @@
 
 ;; Gets an address from the parameters and asserts that the size is correct.
 ;; The address is saved in memory at location 0.
-(func $save_addr_from_param_to_mem_0
+(func $get_parameter (result i64)
   (call $assert_eq
-    (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 32) (i32.const 0))
-    (i32.const 32))
+    (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 8) (i32.const 0))
+    (i32.const 8))
+  (return (i64.load (i32.const 0)))
 )
 
 ;; =================================================================================================================================
@@ -140,18 +141,23 @@
 (func $counter_receive_wrapper(export "counter.inc") (param i64) (result i32)
   ;; interface with concordium blockchain
   (local $entry i64)
-  (local $state i64)
+  (local $state i64) ;; value of counter
+  (local $increase_by i64)
   (local $state_new i64)
-  (i64.store (i32.const 0) (i64.const 0))
+
   ;; get the entry whose key is 8 zeroes
+  (i64.store (i32.const 0) (i64.const 0))
   (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
-  (call $state_entry_read (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
-  (drop)
+  (call $assert_eq
+    (call $state_entry_read (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
+    (i32.const 8))
   ;; read the integer from the contract state
   (local.set $state (i64.load (i32.const 0)))
 
-  (; increment by 1 ;)
-  (local.set $state_new (call $counter_receive (local.get $state) (i64.const 1)))
+  ;; read param passed from rust
+  (local.set $increase_by (call $get_parameter))
+
+  (local.set $state_new (call $counter_receive (local.get $state) (local.get $increase_by)))
   (; return on failure ;)
   (; (if (i64.eq (local.get $state_new) (i64.const -1)) (then (return (i32.const 1)))) ;)
 
@@ -201,8 +207,8 @@
   ;; -1: chain, ctx (not used in counter)
   (local.set $chain (i32.const -1))
   (local.set $ctx   (i32.const -1))
-  (local.set $state (call $call_closure (local.get $i63_to_state_clos) (call $i64_to_i63 (i64.const 4))))
-  (local.set $msg   (call $call_closure (local.get $make_msg_clos)     (call $i64_to_i63 (i64.const 2))))
+  (local.set $state (call $call_closure (local.get $i63_to_state_clos) (call $i64_to_i63 (local.get $count_old))))
+  (local.set $msg   (call $call_closure (local.get $make_msg_clos)     (call $i64_to_i63 (local.get $increase_by))))
 
   ;; call the function CertiCoq-Wasm generated for the counter_receive function
   (local.set $res (call $call_closure4 (local.get $receive_clos) (local.get $chain) (local.get $ctx) (local.get $state) (local.get $msg)))
