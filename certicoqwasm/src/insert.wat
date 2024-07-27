@@ -6,29 +6,21 @@
 ;; assign the expected names to the imported functions
 
 (func $get_parameter_size (param $index i32) (result i32)
-  (call 0 (local.get 0))
-  return)
+  (call 0 (local.get 0)))
 (func $get_parameter_section (param $index i32) (param $write_location i32) (param $length i32) (param $offset i32) (result i32)
-  (call 1 (local.get 0) (local.get 1) (local.get 2) (local.get 3))
-  return)
+  (call 1 (local.get 0) (local.get 1) (local.get 2) (local.get 3)))
 (func $invoke (param $tag i32) (param $start i32) (param $length i32) (result i64)
-  (call 2 (local.get 0) (local.get 1) (local.get 2))
-  return)
+  (call 2 (local.get 0) (local.get 1) (local.get 2)))
 (func $write_output (param $start i32) (param $length i32) (param $offset i32) (result i32)
-  (call 3 (local.get 0) (local.get 1) (local.get 2))
-  return)
+  (call 3 (local.get 0) (local.get 1) (local.get 2)))
 (func $state_lookup_entry (param $key_start i32) (param $key_length i32) (result i64)
-  (call 4 (local.get 0) (local.get 1))
-  return)
+  (call 4 (local.get 0) (local.get 1)))
 (func $state_create_entry (param $key_start i32) (param $key_length i32) (result i64)
-  (call 5 (local.get 0) (local.get 1))
-  return)
+  (call 5 (local.get 0) (local.get 1)))
 (func $state_entry_read (param $entry i64) (param $write_location i32) (param $length i32) (param $offset i32) (result i32)
-  (call 6 (local.get 0) (local.get 1) (local.get 2) (local.get 3))
-  return)
+  (call 6 (local.get 0) (local.get 1) (local.get 2) (local.get 3)))
 (func $state_entry_write (param $entry i64) (param $read_location i32) (param $length i32) (param $offset i32) (result i32)
-  (call 7 (local.get 0) (local.get 1) (local.get 2) (local.get 3))
-  return)
+  (call 7 (local.get 0) (local.get 1) (local.get 2) (local.get 3)))
 
 ;; =================================================================================================================================
 ;; Helper Functions Concordium
@@ -43,18 +35,15 @@
     (then nop)
     (else unreachable)))
 
-;; local.get $actual, why indirection and not just $actual?
 (func $assert_ne (param $actual i32) (param $expected i32)
   (if (i32.ne (local.get $actual) (local.get $expected))
     (then nop)
     (else unreachable)))
 
-;; Gets an address from the parameters and asserts that the size is correct.
-;; The address is saved in memory at location 0.
+;; get 1st parameter
 (func $get_parameter (result i64)
-  (call $assert_eq
-    (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 8) (i32.const 0))
-    (i32.const 8))
+  (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 8) (i32.const 0))
+  (drop)
   (return (i64.load (i32.const 0)))
 )
 
@@ -97,24 +86,24 @@
     (i32.const 8)) ;; Eight bytes should have been written.
 )
 
-
 ;; =================================================================================================================================
 ;; Helper Functions CertiCoq-Wasm
 
-;; get certicoqwasm result
-(func $get_out_of_mem (result i32)
-  (return (global.get 3)) ;; out_of_mem
+(func $assert_not_out_of_mem
+  (call $assert_ne (global.get 3) (i32.const 1))
 )
+
+;; get certicoqwasm result
 (func $get_result (result i32)
-  (call $assert_ne (call $get_out_of_mem) (i32.const 1))
+  (call $assert_not_out_of_mem)
   (return (global.get 2)) ;; result_var
 )
 
 (func $get_result_monad_ok (param $result i32) (result i32)
-  ;; ordinal of Ok is 0
-  (call $assert_eq (i32.load (local.get $result)) (i32.const 0))
-  (return (i32.load (i32.add (local.get $result) (i32.const 4))))
+  (call $assert_eq (i32.load (local.get $result)) (i32.const 0)) ;; ordinal of Ok is 0
+  (return (i32.load (i32.add (local.get $result) (i32.const 4)))) ;; return value wrapped by Ok
 )
+
 (func $make_Some (param $arg i32) (result i32) (local $res i32)
   ;; allocate (Some arg)
   (local.set $res (global.get 0))
@@ -129,15 +118,15 @@
   ;; 0 is global mem_ptr
   (local.set $res (global.get 0))
   (i64.store (global.get 0) (local.get $val)) 
-  (global.set 0 (i32.add (global.get 0) (i32.const 8)))
+  (global.set 0 (i32.add (global.get 0) (i32.const 8))) ;; increase global mem_ptr so i64 is not overwritten later
   (return (local.get $res))
 )
 (func $i63_to_i64 (param $ptr i32) (result i64)
-  (call $assert_ne (call $get_out_of_mem) (i32.const 1))
+  (call $assert_not_out_of_mem)
   (return (i64.load (local.get $ptr))) 
 )
 
-;; the parameter clos is an i32 pointing to a con_15 (lANF closure)
+;; the parameter clos is an i32 pointing to a con_15(fidx, env) lANF closure
 (func $call_closure (param $clos i32) (param $arg i32) (result i32)
   (local $fidx i32) (local $env i32)
   ;; ordinal of con_15 is 0
@@ -149,14 +138,14 @@
   (return (call $get_result))
 )
 ;; convenient uncurried function application with n args
-(func $call_closure2 (param $clos i32) (param $arg1 i32) (param $arg2 i32) (result i32)
+(func $uncurry2 (param $clos i32) (param $arg1 i32) (param $arg2 i32) (result i32)
   (return (call $call_closure (call $call_closure (local.get $clos) (local.get $arg1)) (local.get $arg2)))
 )
-(func $call_closure3 (param $clos i32) (param $arg1 i32) (param $arg2 i32) (param $arg3 i32) (result i32)
-  (return (call $call_closure2 (call $call_closure (local.get $clos) (local.get $arg1)) (local.get $arg2) (local.get $arg3)))
+(func $uncurry3 (param $clos i32) (param $arg1 i32) (param $arg2 i32) (param $arg3 i32) (result i32)
+  (return (call $uncurry2 (call $call_closure (local.get $clos) (local.get $arg1)) (local.get $arg2) (local.get $arg3)))
 )
-(func $call_closure4 (param $clos i32) (param $arg1 i32) (param $arg2 i32) (param $arg3 i32) (param $arg4 i32)(result i32)
-  (return (call $call_closure3 (call $call_closure (local.get $clos) (local.get $arg1)) (local.get $arg2) (local.get $arg3) (local.get $arg4)))
+(func $uncurry4 (param $clos i32) (param $arg1 i32) (param $arg2 i32) (param $arg3 i32) (param $arg4 i32)(result i32)
+  (return (call $uncurry3 (call $call_closure (local.get $clos) (local.get $arg1)) (local.get $arg2) (local.get $arg3) (local.get $arg4)))
 )
 
 ;; =================================================================================================================================
@@ -173,14 +162,12 @@
 
 (func $init_counter (export "init_counter") (param i64) (result i32)
   (local $init_value i64)
-  ;; create state entry
-  (i64.store (i32.const 0) (i64.const 0))
-  (call $assert_eq
-     (call $state_entry_write (call $state_create_entry (i32.const 0) (i32.const 8)) (i32.const 0) (i32.const 8) (i32.const 0))
-     (i32.const 8))
 
-  ;; set state entry
-  ;;(local.set $init_value (call $get_parameter))
+  ;; counter initial value
+  (local.set $init_value (call $get_parameter))
+
+  ;; create and set state entry
+  (call $state_create_entry (i32.const 0) (i32.const 8))
   (call $set_state (local.get $init_value))
 
   (return (i32.const 0)) ;; Successful init
@@ -228,8 +215,7 @@
   ;; reserve the first 100 bytes in the linmem for concordium IO
   ;; I think only the first 8 are used (more for good measure)
   (global.set 0 (i32.add (i32.const 100) (global.get 0))) ;; global_mem_ptr
-  ;; call main
-  (call 9)
+  (call 9) ;; call main
   (local.set $main_res (call $get_result))
 
   ;; concwmd_receive
@@ -248,7 +234,7 @@
   (local.set $msg   (call $call_closure (local.get $make_msg_clos)     (call $i64_to_i63 (local.get $increase_by))))
 
   ;; call the function CertiCoq-Wasm generated for the counter_receive function
-  (local.set $res (call $call_closure4 (local.get $receive_clos) (local.get $chain) (local.get $ctx) (local.get $state) (local.get $msg)))
+  (local.set $res (call $uncurry4 (local.get $receive_clos) (local.get $chain) (local.get $ctx) (local.get $state) (local.get $msg)))
 
   ;; Ok (state * list actionBody)
   ;; (return (i64.extend_i32_s (i32.load (local.get $res))))
@@ -256,10 +242,9 @@
   (local.set $res (i32.load (i32.add (local.get $res) (i32.const 4)))) ;; state
   (local.set $res (call $call_closure (local.get $state_to_i63_clos) (local.get $res))) ;; ptr -> i64
 
-  (return (call $i63_to_i64 (local.get $res))) ;; return i64 (current counter value)
+  (return (call $i63_to_i64 (local.get $res))) ;; current counter value
 ;;   (i64.extend_i32_s (local.get $res))
-  ;; (i64.add (local.get 0) (i64.const 1))
- )
+)
 ;; =================================================================================================================================
 ;; end manual insertion
 ;; =================================================================================================================================

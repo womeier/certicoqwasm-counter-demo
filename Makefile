@@ -14,6 +14,6 @@ run-concordium-test:
 	wat2wasm ./certicoqwasm/src/counter_out.wat -o ./certicoqwasm/src/counter_out.wasm
 	wasm-opt --coalesce-locals ./certicoqwasm/src/counter_out.wasm -o ./certicoqwasm/src/counter_out_opt.wasm
 	mv ./certicoqwasm/src/counter_out_opt.wasm ./certicoqwasm/src/counter_out.wasm
-	wasm2wat ./certicoqwasm/src/counter_out.wasm -o ./certicoqwasm/src/counter_out.wat
+#	wasm2wat ./certicoqwasm/src/counter_out.wasm -o ./certicoqwasm/src/counter_out.wat
 #	wasm-tools parse ./certicoqwasm/src/counter_out.wat -o ./certicoqwasm/src/counter_out.wasm
 	cd certicoqwasm && cargo run

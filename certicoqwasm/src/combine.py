@@ -8,6 +8,9 @@ import os
 @click.option("--insert-file", type=str, help=".wat file", required=True)
 @click.option("--out-file", type=str, help=".wat file", required=True)
 def insert(certicoq_wasm_file, insert_file, out_file):
+    assert ".wat" in certicoq_wasm_file
+    assert ".wat" in insert_file
+    assert ".wat" in out_file
     with open(insert_file) as f_insert:
         with open(certicoq_wasm_file) as f_wasm:
             wat_certicoqwasm = f_wasm.read()
