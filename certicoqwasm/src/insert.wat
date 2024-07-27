@@ -149,7 +149,7 @@
 )
 
 ;; =================================================================================================================================
-;; The counter contract, see the record (COUNTER_MODULE : ConcordiumWasmMod _ _) in CounterConcordiumWasm.v.
+;; The counter contract, see the record (COUNTER_MODULE : ConcordiumWasmMod _ _) in CounterConcordiumWasm.v in the ConCert repo.
 
 (; running the main function returns the record COUNTER_MODULE
 (representation: pointer to lin mem with tag followed by the following)
@@ -158,6 +158,7 @@
    concwmd_receive : chain -> ctx -> state -> option state -> result (state * actions)
    concwmd_encode_state : state -> i63
    concwmd_decode_state : i63 -> state
+   concwmd_make_msg : i63 -> option Msg
 ;)
 
 (func $init_counter (export "init_counter") (param i64) (result i32)
