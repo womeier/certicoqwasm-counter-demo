@@ -32,7 +32,7 @@ fn main() {
             InitContractPayload {
                 mod_ref: deployment.module_reference, // Module to initialize from.
                 init_name: OwnedContractName::new_unchecked("init_counter".into()), // Contract to init.
-                param: OwnedParameter::from_serial(&0u32).unwrap(), // Any type implementing [`Serial`] can be used.
+                param: OwnedParameter::from_serial(&0u32).unwrap(), // Any type implementing [`Serial`] can be used. (ignored. initialize with 0)
                 amount: Amount::zero(),                             // CCD to send the contract.
             },
         )

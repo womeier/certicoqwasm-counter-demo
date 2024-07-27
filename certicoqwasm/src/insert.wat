@@ -52,11 +52,52 @@
 ;; Gets an address from the parameters and asserts that the size is correct.
 ;; The address is saved in memory at location 0.
 (func $get_parameter (result i64)
+  (i64.store (i32.const 0) (i64.const 0))
   (call $assert_eq
     (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 8) (i32.const 0))
     (i32.const 8))
   (return (i64.load (i32.const 0)))
 )
+
+;; Write a u64 to the [] entry in the state and assert that it succeeded. (adapted from fib.wat)
+(func $set_state (param $val i64)
+  (local $entry i64)
+  (i64.store (i32.const 0) (i64.const 0))
+  ;; Get the id for the entry at [].
+  (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
+  ;; Store the input value at memory location 0.
+  (i64.store (i32.const 0) (local.get $val))
+  ;; Then write the u64 to the state from the position 0 in memory. Also check that writing succeeded.
+  (call $assert_eq
+    (call $state_entry_write (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
+    (i32.const 8)) ;; Eight bytes should have been written.
+)
+
+;; Read the u64 state to wasm memory location 0 and assert that 8 bytes were read. (adapted from fib.wat)
+(func $get_state (result i64)
+  (local $entry i64)
+  (i64.store (i32.const 0) (i64.const 0))
+  ;; Get the id for the entry at [].
+  (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
+  ;; Read to memory position 0.
+  (call $assert_eq
+    (call $state_entry_read (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
+    (i32.const 8)
+  )
+  ;; Return the state value.
+  (i64.load (i32.const 0))
+)
+
+;; Set the provided u64 as the return value, by using the `write_output` host function. Asserts that it succeeded. (taken from fib.wat)
+(func $set_return_value (param $val i64)
+  ;; Store the value at memory location 16.
+  (i64.store (i32.const 0) (local.get $val))
+  ;; Then write the u64 to the output from the position 0 in memory. Also check that writing succeeded.
+  (call $assert_eq
+    (call $write_output (i32.const 0) (i32.const 8) (i32.const 0))
+    (i32.const 8)) ;; Eight bytes should have been written.
+)
+
 
 ;; =================================================================================================================================
 ;; Helper Functions CertiCoq-Wasm
@@ -132,42 +173,38 @@
 ;)
 
 (func $init_counter (export "init_counter") (param i64) (result i32)
+  (local $init_value i64)
+  ;; create state entry
   (i64.store (i32.const 0) (i64.const 0))
-  ;; store the state in the entry whose key is 8 zeroes.
-  (call $state_entry_write (call $state_create_entry (i32.const 0) (i32.const 8)) (i32.const 0) (i32.const 8) (i32.const 0))
+  (call $assert_eq
+     (call $state_entry_write (call $state_create_entry (i32.const 0) (i32.const 8)) (i32.const 0) (i32.const 8) (i32.const 0))
+     (i32.const 8))
+
+  ;; set state entry
+  ;;(local.set $init_value (call $get_parameter))
+  (call $set_state (local.get $init_value))
+
   (return (i32.const 0)) ;; Successful init
 )
 
+;; This function wraps the interface with the concordium blockchain
 (func $counter_receive_wrapper(export "counter.inc") (param i64) (result i32)
-  ;; interface with concordium blockchain
-  (local $entry i64)
   (local $state i64) ;; value of counter
   (local $increase_by i64)
   (local $state_new i64)
 
-  ;; get the entry whose key is 8 zeroes
-  (i64.store (i32.const 0) (i64.const 0))
-  (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
-  (call $assert_eq
-    (call $state_entry_read (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
-    (i32.const 8))
   ;; read the integer from the contract state
-  (local.set $state (i64.load (i32.const 0)))
-
+  (local.set $state (call $get_state))
   ;; read param passed from rust
   (local.set $increase_by (call $get_parameter))
 
+  ;; ==> call certicoq-wasm contract
   (local.set $state_new (call $counter_receive (local.get $state) (local.get $increase_by)))
-  (; return on failure ;)
-  (; (if (i64.eq (local.get $state_new) (i64.const -1)) (then (return (i32.const 1)))) ;)
 
-  (i64.store (i32.const 0) (local.get $state_new))
   ;; update the contract state
-  (call $state_entry_write (local.get $entry) (i32.const 0) (i32.const 8) (i32.const 0))
-  (drop)
+  (call $set_state (local.get $state_new))
   ;; and then write the return value
-  (call $write_output (i32.const 0) (i32.const 8) (i32.const 0))
-  (drop)
+  (call $set_return_value (local.get $state_new))
   ;; and return success
   (i32.const 0)
 )
