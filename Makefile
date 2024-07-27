@@ -12,5 +12,8 @@ run-concordium-test:
 	python3 ./certicoqwasm/src/combine.py --certicoq-wasm-file ./certicoqwasm/src/COUNTER_MODULE.wat \
 		--insert-file ./certicoqwasm/src/insert.wat --out-file ./certicoqwasm/src/counter_out.wat
 	wat2wasm ./certicoqwasm/src/counter_out.wat -o ./certicoqwasm/src/counter_out.wasm
+	wasm-opt --coalesce-locals ./certicoqwasm/src/counter_out.wasm -o ./certicoqwasm/src/counter_out_opt.wasm
+	mv ./certicoqwasm/src/counter_out_opt.wasm ./certicoqwasm/src/counter_out.wasm
+	wasm2wat ./certicoqwasm/src/counter_out.wasm -o ./certicoqwasm/src/counter_out.wat
 #	wasm-tools parse ./certicoqwasm/src/counter_out.wat -o ./certicoqwasm/src/counter_out.wasm
 	cd certicoqwasm && cargo run

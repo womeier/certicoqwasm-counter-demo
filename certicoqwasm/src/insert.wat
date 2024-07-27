@@ -52,7 +52,6 @@
 ;; Gets an address from the parameters and asserts that the size is correct.
 ;; The address is saved in memory at location 0.
 (func $get_parameter (result i64)
-  (i64.store (i32.const 0) (i64.const 0))
   (call $assert_eq
     (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 8) (i32.const 0))
     (i32.const 8))
@@ -62,8 +61,8 @@
 ;; Write a u64 to the [] entry in the state and assert that it succeeded. (adapted from fib.wat)
 (func $set_state (param $val i64)
   (local $entry i64)
-  (i64.store (i32.const 0) (i64.const 0))
   ;; Get the id for the entry at [].
+  (i64.store (i32.const 0) (i64.const 0))
   (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
   ;; Store the input value at memory location 0.
   (i64.store (i32.const 0) (local.get $val))
@@ -76,8 +75,8 @@
 ;; Read the u64 state to wasm memory location 0 and assert that 8 bytes were read. (adapted from fib.wat)
 (func $get_state (result i64)
   (local $entry i64)
-  (i64.store (i32.const 0) (i64.const 0))
   ;; Get the id for the entry at [].
+  (i64.store (i32.const 0) (i64.const 0))
   (local.set $entry (call $state_lookup_entry (i32.const 0) (i32.const 8)))
   ;; Read to memory position 0.
   (call $assert_eq
@@ -226,7 +225,8 @@
 
   (local $res i32) ;; final result
 
-  ;; reserve the first 100 bytes in the linmem for concordium IO (for good measure, arbitrary choice)
+  ;; reserve the first 100 bytes in the linmem for concordium IO
+  ;; I think only the first 8 are used (more for good measure)
   (global.set 0 (i32.add (i32.const 100) (global.get 0))) ;; global_mem_ptr
   ;; call main
   (call 9)
