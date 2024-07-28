@@ -42,6 +42,7 @@
 
 ;; get 1st parameter
 (func $get_parameter (result i64)
+  (i64.store (i32.const 0) (i64.const 0))
   (call $get_parameter_section (i32.const 0) (i32.const 0) (i32.const 8) (i32.const 0))
   (drop)
   (return (i64.load (i32.const 0)))
@@ -161,17 +162,66 @@
    concwmd_make_msg : i63 -> option Msg
 ;)
 
-(func $init_counter (export "init_counter") (param i64) (result i32)
+(func $counter_init_wrapper (export "init_counter") (param i64) (result i32)
   (local $init_value i64)
 
-  ;; counter initial value
-  (local.set $init_value (call $get_parameter))
-
-  ;; create and set state entry
+  ;; create and state entry
   (call $state_create_entry (i32.const 0) (i32.const 8))
+
+  ;; get counter initial value
+  (local.set $init_value (call $get_parameter))
+  ;; ==> call certicoq-wasm contract (Counter.counter_init)
+  (local.set $init_value (call $counter_init (local.get $init_value)))
+
+  ;; set state entry
   (call $set_state (local.get $init_value))
 
   (return (i32.const 0)) ;; Successful init
+)
+
+(func $counter_init (param $init_value i64) (result i64)
+  (local $main_res i32)
+  (local $init_clos i32)
+  (local $state_to_i63_clos i32)
+  (local $i63_to_Z_clos i32)
+
+  ;; args for the init function
+  (local $chain i32)
+  (local $ctx i32)
+  (local $init_value_Z i32)
+
+  (local $res i32) ;; final result
+
+  ;; reserve the first 100 bytes in the linmem for concordium IO
+  ;; I think only the first 8 are used (more for good measure)
+  (global.set 0 (i32.add (i32.const 100) (global.get 0))) ;; global_mem_ptr
+
+  ;; this shouldn't be necessary wtf?
+  (i64.store (i32.const 0) (i64.const 0))
+
+  (call 9) ;; call main
+  (local.set $main_res (call $get_result))
+  ;; concwmd_init
+  (local.set $init_clos (i32.load (i32.add (local.get $main_res) (i32.const 4))))
+  ;; concwmd_encode_state
+  (local.set $state_to_i63_clos (i32.load (i32.add (local.get $main_res) (i32.const 12))))
+  ;; concwmd_i63_to_Z
+  (local.set $i63_to_Z_clos (i32.load (i32.add (local.get $main_res) (i32.const 24))))
+
+  (local.set $chain (i32.const -1)) ;; unused
+  (local.set $ctx (i32.const 0)) ;; 0 ok here, init function loads i32 from addr 0+4, encode_state discards it
+
+  (local.set $init_value_Z
+    (call $call_closure (local.get $i63_to_Z_clos) (call $i64_to_i63 (local.get $init_value)))
+  )
+
+  ;; call the function CertiCoq-Wasm generated for the counter_init function
+  (local.set $res (call $uncurry3 (local.get $init_clos) (local.get $chain) (local.get $ctx) (local.get $init_value_Z)))
+  (local.set $res (call $get_result_monad_ok (local.get $res))) ;; state
+  (local.set $res (call $call_closure (local.get $state_to_i63_clos) (local.get $res))) ;; ptr -> i64
+
+  (return (local.get $init_value))
+;;  (return (call $i63_to_i64 (local.get $res))) ;; counter value
 )
 
 ;; This function wraps the interface with the concordium blockchain
@@ -185,7 +235,7 @@
   ;; read param passed from rust
   (local.set $increase_by (call $get_parameter))
 
-  ;; ==> call certicoq-wasm contract
+  ;; ==> call certicoq-wasm contract (Counter.counter_receive)
   (local.set $state_new (call $counter_receive (local.get $state) (local.get $increase_by)))
 
   ;; update the contract state
